@@ -1,6 +1,7 @@
 use super::direction::*;
 use super::conditionals::*;
 use super::registers::{Reg8, Reg16};
+use super::*;
 
 pub enum Instruction {
 	// Data -> http://goldencrystal.free.fr/GBZ80Opcodes.pdf
@@ -34,7 +35,7 @@ pub enum Instruction {
 	ALUaN		(u8),
 	POPrr		(Reg16),
 	PUSHrr		(Reg16),
-	RSTn		(u8), //todo: wtf is N >> 3 ??
+	RSTn		(u8), //todo: wtf is N >> 3 (in the doc) ??
 	RETc		(Conditional),
 	RET,
 	RETI,
@@ -62,4 +63,10 @@ pub enum Instruction {
 	BITnR		(u8, Reg8),
 	RESnR		(u8, Reg8),
 	SETnR		(u8, Reg8),
+}
+
+impl Instruction {
+	pub fn fetch(mem: &mut bus::MemoryBus, pc: &mut u16) -> Instruction {
+		Instruction::NOP
+	}
 }
