@@ -82,4 +82,6 @@ fn main() {
 
     let mut cpu: CPU = Default::default();
     cpu.memory.load_boot_rom(&boot_rom[..256]);
+
+    cpu.run();
 }

@@ -1,31 +1,44 @@
 use super::core::*;
 
 const ROM_SPACE_BEGIN:		usize = 0x0000;
-const ROM_SPACE_END:		usize = 0x8000;
+const ROM_SPACE_END:		usize = 0x8000-1;
 const VRAM_BEGIN:			usize = 0x8000;
-const VRAM_END:				usize = 0xA000;
+const VRAM_END:				usize = 0xA000-1;
 const EXTERNAL_RAM_BEGIN: 	usize = 0xA000;
-const EXTERNAL_RAM_END:		usize = 0xC000;
+const EXTERNAL_RAM_END:		usize = 0xC000-1;
 const RAM_BEGIN: 			usize = 0xC000;
-const RAM_END: 				usize = 0xE000;
+const RAM_END: 				usize = 0xE000-1;
 const OAM_RAM_BEGIN:		usize = 0xFE00;
-const OAM_RAM_END:			usize = 0xFEA0;
+const OAM_RAM_END:			usize = 0xFEA0-1;
 const IO_RAM_BEGIN:			usize = 0xFF00;
-const IO_RAM_END: 			usize = 0xFF80;
+const IO_RAM_END: 			usize = 0xFF80-1;
 const HRAM_BEGIN: 			usize = 0xFF80;
 const HRAM_END: 			usize = 0xFFFF;
 
 pub struct MemoryBus {
-	rom_mem:	[u8; ROM_SPACE_END - ROM_SPACE_BEGIN],
-	vram_mem:	[u8; VRAM_END - VRAM_BEGIN],
-	extern_mem:	[u8; EXTERNAL_RAM_END - EXTERNAL_RAM_BEGIN],
-	ram_mem: 	[u8; RAM_END - RAM_BEGIN],
-	oam_mem: 	[u8; OAM_RAM_END - OAM_RAM_BEGIN],
-	io_ram_mem:	[u8; IO_RAM_END - IO_RAM_BEGIN],
-	hram_mem: 	[u8; HRAM_END - HRAM_BEGIN],
+	rom_mem:	[u8; ROM_SPACE_END - ROM_SPACE_BEGIN + 1],
+	vram_mem:	[u8; VRAM_END - VRAM_BEGIN + 1],
+	extern_mem:	[u8; EXTERNAL_RAM_END - EXTERNAL_RAM_BEGIN + 1],
+	ram_mem: 	[u8; RAM_END - RAM_BEGIN + 1],
+	oam_mem: 	[u8; OAM_RAM_END - OAM_RAM_BEGIN + 1],
+	io_ram_mem:	[u8; IO_RAM_END - IO_RAM_BEGIN + 1],
+	hram_mem: 	[u8; HRAM_END - HRAM_BEGIN + 1],
 }
 
 impl MemoryBus {
+
+	pub fn get_imm8(&self, pc: &mut u16) -> u8 {
+		let ret = self.get_byte(*pc as usize);
+		*pc += 1;
+		ret.unwrap()
+	}
+
+	pub fn get_imm16(&self, pc: &mut u16) -> u16 {
+		let ret = self.get_2bytes(*pc as usize);
+		*pc += 2;
+		ret.unwrap()
+	}
+
 	pub fn get_byte(&self, address: usize) -> Option<u8> {
 		return match address {
 			ROM_SPACE_BEGIN ..= ROM_SPACE_END => {
@@ -49,7 +62,10 @@ impl MemoryBus {
 			HRAM_BEGIN ..= HRAM_END => {
 				Some(self.hram_mem[address - HRAM_BEGIN])
 			},
-			_ => None
+			_ => {
+				warn_or_crash(String::from("CPU tried to access unassigned part of memory"));
+				None
+			}
 		}
 	}
 
@@ -82,7 +98,10 @@ impl MemoryBus {
 				Some(combine_bytes( self.hram_mem[address - HRAM_BEGIN],
 									self.hram_mem[address - HRAM_BEGIN + 1]))
 			},
-			_ => None
+			_ => {
+				warn_or_crash(String::from("CPU tried to access unassigned part of memory"));
+				None
+			}
 		}
 	}
 
@@ -109,7 +128,9 @@ impl MemoryBus {
 			HRAM_BEGIN ..= HRAM_END => {
 				self.hram_mem[address - HRAM_BEGIN] = data;
 			},
-			_ => {},
+			_ => {
+				warn_or_crash(String::from("CPU tried to write on an unassigned part of memory"));
+			}
 		}
 	}
 
@@ -143,7 +164,9 @@ impl MemoryBus {
 				self.hram_mem[address - HRAM_BEGIN] = (data << 8) as u8;
 				self.hram_mem[address - HRAM_BEGIN + 1] = (data & 0xFF) as u8;
 			},
-			_ => {},
+			_ => {
+				warn_or_crash(String::from("CPU tried to write on an unassigned part of memory"));
+			},
 		}
 	}
 
@@ -155,13 +178,13 @@ impl MemoryBus {
 impl Default for MemoryBus {
 	fn default() -> Self {
 		MemoryBus {
-			rom_mem:	[0; ROM_SPACE_END - ROM_SPACE_BEGIN],
-			vram_mem:	[0; VRAM_END - VRAM_BEGIN],
-			extern_mem:	[0; EXTERNAL_RAM_END - EXTERNAL_RAM_BEGIN],
-			ram_mem: 	[0; RAM_END - RAM_BEGIN],
-			oam_mem: 	[0; OAM_RAM_END - OAM_RAM_BEGIN],
-			io_ram_mem:	[0; IO_RAM_END - IO_RAM_BEGIN],
-			hram_mem: 	[0; HRAM_END - HRAM_BEGIN],
+			rom_mem:	[0; ROM_SPACE_END - ROM_SPACE_BEGIN + 1],
+			vram_mem:	[0; VRAM_END - VRAM_BEGIN + 1],
+			extern_mem:	[0; EXTERNAL_RAM_END - EXTERNAL_RAM_BEGIN + 1],
+			ram_mem: 	[0; RAM_END - RAM_BEGIN + 1],
+			oam_mem: 	[0; OAM_RAM_END - OAM_RAM_BEGIN + 1],
+			io_ram_mem:	[0; IO_RAM_END - IO_RAM_BEGIN + 1],
+			hram_mem: 	[0; HRAM_END - HRAM_BEGIN + 1],
 		}
 	}
 }

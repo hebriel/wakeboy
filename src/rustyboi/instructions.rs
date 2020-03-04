@@ -1,7 +1,8 @@
 use super::direction::*;
 use super::conditionals::*;
 use super::registers::{Reg8, Reg16};
-use super::*;
+use super::bus::*;
+use super::core::*;
 
 pub enum Instruction {
 	// Data -> http://goldencrystal.free.fr/GBZ80Opcodes.pdf
@@ -63,10 +64,33 @@ pub enum Instruction {
 	BITnR		(u8, Reg8),
 	RESnR		(u8, Reg8),
 	SETnR		(u8, Reg8),
+	Unknown,
 }
 
 impl Instruction {
-	pub fn fetch(mem: &mut bus::MemoryBus, pc: &mut u16) -> Instruction {
-		Instruction::NOP
+	pub fn fetch(mem: &mut MemoryBus, pc: &mut u16) -> Instruction {
+
+		let opcode = mem.get_byte(*pc as usize).unwrap();
+		
+		if opcode == 0x00 {
+			return Instruction::NOP
+		}
+
+		match opcode {
+			0xCB => {
+				let opcode = mem.get_imm8(pc);
+				let header = opcode & 0xF0;
+				match header {
+					0b0000 => return Instruction::RdCr(Direction::from((header & 0b00001000) >> 3), Reg8::from(opcode & 0b111)),
+					0b0001 => return Instruction::RdR(Direction::from((header & 0b00001000) >> 3), Reg8::from(opcode & 0b111)),
+					0b0010 => return Instruction::SdAr(Direction::from((header & 0b00001000) >> 3), Reg8::from(opcode & 0b111)),
+					0b0011 => return Instruction::SWAPr(Reg8::from(opcode & 0b111)),
+					_ => { warn_or_crash(String::from("Invalid instruction")) }
+				}
+			},
+			_ => {}
+		}
+
+		Instruction::Unknown
 	}
 }

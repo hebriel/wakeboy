@@ -16,6 +16,13 @@ impl CPU {
 	}
 
 	pub fn execute(&mut self, instruction: &Instruction) -> u16 {
+
+		match *instruction {
+			Instruction::NOP => { println!("NOP") },
+			Instruction::Unknown => { println!("Unknown") },
+			_ => {},
+		}
+
 		self.registers.pc.wrapping_add(1)
 	}
 }
