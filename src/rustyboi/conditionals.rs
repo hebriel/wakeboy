@@ -1,11 +1,12 @@
 use super::core::*;
 
+#[derive(Copy, Clone)]
 pub enum Conditional {
 	NotZero,
 	Zero,
 	NotCarry,
 	Carry,
-	Unknown,
+	Invalid,
 }
 
 impl std::convert::From<u8> for Conditional {
@@ -17,8 +18,21 @@ impl std::convert::From<u8> for Conditional {
 			0b11 => Conditional::Carry,
 			_ 	 => {
 				warn_or_crash(format!("Unknown Conditional ({:#b})", bits));
-				Conditional::Unknown
+				Conditional::Invalid
 			}
 		}
 	}
+}
+
+impl std::fmt::Display for Conditional {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let ret = match *self {
+			Conditional::NotZero => "NZ",
+			Conditional::Zero => "Z",
+			Conditional::NotCarry => "NC",
+			Conditional::Carry => "C",
+			Conditional::Invalid => "Invalid Conditional",
+		};
+		write!(f, "{}", ret)
+    }
 }

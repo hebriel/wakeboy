@@ -28,14 +28,15 @@ pub struct MemoryBus {
 impl MemoryBus {
 
 	pub fn get_imm8(&self, pc: &mut u16) -> u8 {
-		let ret = self.get_byte(*pc as usize);
 		*pc += 1;
+		let ret = self.get_byte(*pc as usize);
 		ret.unwrap()
 	}
 
 	pub fn get_imm16(&self, pc: &mut u16) -> u16 {
+		*pc += 1;
 		let ret = self.get_2bytes(*pc as usize);
-		*pc += 2;
+		*pc += 1;
 		ret.unwrap()
 	}
 

@@ -1,14 +1,16 @@
 use super::core::*;
 
+#[derive(Copy, Clone, std::cmp::PartialEq)]
 pub enum Reg8 {
 	B, C, D,
 	E, H, L,
-	MHL, A, Unknown
+	MHL, A, Invalid
 }
 
+#[derive(Copy, Clone, std::cmp::PartialEq)]
 pub enum Reg16 {
 	BC, DE, HL,
-	SP, AF, Unknown
+	SP, AF, Invalid
 }
 
 #[derive(Default)]
@@ -36,14 +38,14 @@ impl std::convert::From<u8> for Reg8 {
 			0b111 => Reg8::A,
 			_ => {
 				warn_or_crash(String::from("Program encountered invalid register denominator"));
-				Reg8::Unknown
+				Reg8::Invalid
 			}
 		}
 	}
 }
 
 impl Reg16 {
-	fn from(bits: u8, want_sp: bool) -> Self {
+	pub fn from(bits: u8, want_sp: bool) -> Self {
 		match bits {
 			0b00 => Reg16::BC,
 			0b01 => Reg16::DE,
@@ -53,8 +55,39 @@ impl Reg16 {
 			}
 			_ => {
 				warn_or_crash(String::from("Program encountered invalid register denominator"));
-				Reg16::Unknown
+				Reg16::Invalid
 			}
 		}
 	}
+}
+
+impl std::fmt::Display for Reg8 {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let ret = match *self {
+			Reg8::A => "A",
+			Reg8::B => "B",
+			Reg8::C => "C",
+			Reg8::D => "D",
+			Reg8::E => "E",
+			Reg8::H => "H",
+			Reg8::L => "L",
+			Reg8::MHL => "(HL)",
+			Reg8::Invalid => "Invalid Reg8",
+		};
+		write!(f, "{}", ret)
+    }
+}
+
+impl std::fmt::Display for Reg16 {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let ret = match *self {
+			Reg16::AF => "AF",
+			Reg16::BC => "BC",
+			Reg16::DE => "DE",
+			Reg16::HL => "HL",
+			Reg16::SP => "SP",
+			Reg16::Invalid => "Invalid Reg16",
+		};
+		write!(f, "{}", ret)
+    }
 }

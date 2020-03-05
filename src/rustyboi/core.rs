@@ -46,5 +46,5 @@ pub fn read_rom(path: &String) -> Option<Vec<u8>> {
 
 #[inline(always)]
 pub fn combine_bytes(b1: u8, b2: u8) -> u16 {
-	((b1 as u16) << 8) | b2 as u16
+	((b2 as u16) << 8) | b1 as u16
 }

@@ -6,3 +6,4 @@ pub mod registers;
 pub mod cpu;
 pub mod flags;
 pub mod bus;
+pub mod aluops;

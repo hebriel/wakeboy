@@ -24,7 +24,7 @@ impl RegFlags {
 			Conditional::Zero => self.z,
 			Conditional::NotCarry => !self.c,
 			Conditional::Carry => self.c,
-			Conditional::Unknown => false,
+			Conditional::Invalid => false,
 		}
 	}
 }
