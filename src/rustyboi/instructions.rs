@@ -297,7 +297,7 @@ impl Instruction {
 					}
 					0b111 => {
 						let n = six_bit_rem & 0b111000;
-						return (Instruction::RSTn(n), format!("RST {:#04}", n))
+						return (Instruction::RSTn(n), format!("RST {:#04x}", n))
 					},
 					0b000 => {
 						let conditional = Conditional::from((six_bit_rem & 0b011000) >> 3);
