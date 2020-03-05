@@ -1,13 +1,13 @@
-mod rustyboi;
+mod wakeboy;
 
 use structopt::StructOpt;
 use std::path::PathBuf;
-use rustyboi::core::*;
-use rustyboi::cpu::*;
+use wakeboy::core::*;
+use wakeboy::cpu::*;
 use colored::*;
 
 #[derive(StructOpt, Debug)]
-#[structopt(name = "rustyboi-i")]
+#[structopt(name = "wakeboy-i")]
 struct Opt {
     /// Rom file to execute
     #[structopt(short, long, parse(from_os_str), default_value = "__none")]
